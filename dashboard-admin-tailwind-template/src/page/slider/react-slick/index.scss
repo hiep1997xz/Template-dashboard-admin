@@ -1,0 +1,21 @@
+.slick-slider {
+  width: 495px;
+}
+
+.slick-slide img {
+  border: 1px solid #5f9ea0;
+}
+
+.slick-next {
+  right: -40px !important;
+}
+
+.slick-prev {
+  left: -40px !important;
+}
+.slick-slide,
+.slick-slide.slick-active,
+.slick-slide.slick-cloned {
+  padding-left: 10px;
+  padding-right: 10px;
+}

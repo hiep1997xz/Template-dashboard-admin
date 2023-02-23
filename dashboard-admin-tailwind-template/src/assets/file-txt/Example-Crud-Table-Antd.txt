@@ -1,0 +1,305 @@
+import { Button, Col, Empty, message, Modal, Row, Table, Typography } from 'antd'
+import axios from 'axios'
+import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import FormCreateUser from './FormCreateUser'
+import './index.css'
+
+const { Title } = Typography
+
+const TableAntd = () => {
+  const [getData, setGetData] = useState([])
+  const navigate = useNavigate()
+
+  const fetchUser = () => {
+    axios
+      .get('http://localhost:4000/users')
+      .then((response) => {
+        setGetData(response.data)
+      })
+      .catch((err) => {})
+  }
+
+  useEffect(() => {
+    fetchUser()
+  }, [])
+
+  const columns = [
+    {
+      title: 'Username',
+      dataIndex: 'username',
+      key: 'username',
+    },
+    {
+      title: 'Email',
+      dataIndex: 'email',
+      key: 'email',
+    },
+    {
+      title: 'Gender',
+      dataIndex: 'gender',
+      key: 'gender',
+    },
+    {
+      title: 'Review',
+      dataIndex: 'review',
+      key: 'review',
+    },
+    {
+      title: 'Action',
+      dataIndex: 'action',
+      render: (_, record) => {
+        return (
+          <>
+            <Button
+              type="primary"
+              onClick={() => navigate(`/create-user?id=${record.id}`)}>
+              Edit
+            </Button>
+            <Button type="danger" onClick={() => handleDelete(record)}>
+              Delete
+            </Button>
+          </>
+        )
+      },
+      key: 'action',
+    },
+  ]
+
+  const handleDelete = (record) => {
+    axios
+      .delete(`http://localhost:4000/users/${record?.id}`)
+      .then((res) => {
+        fetchUser()
+        message.success('Deleted User Successfully!')
+      })
+      .catch((err) => {})
+  }
+
+  return (
+    <>
+      <div className="m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl">
+        <Row gutter={[40, 0]}>
+          <Col span={18}>
+            <Title level={2}>User List</Title>
+          </Col>
+          <Col span={6}>
+            <Button onClick={() => navigate('/create-user')} block>
+              Add User
+            </Button>
+          </Col>
+        </Row>
+        <a href='' className=''>Link code</a>
+        {/* ko co data */}
+        {/* <ConfigProvider renderEmpty={() => <Empty description="Custom message"/>}>
+            <Table columns={columns} dataSource={data} />
+          </ConfigProvider> */}
+        <Table
+          columns={columns}
+          dataSource={getData ? getData : <Empty />}
+          bordered
+        />
+      </div>
+    </>
+  )
+}
+
+export default TableAntd
+
+
+
+
+
+import {
+  Button,
+  Col,
+  Form,
+  Input,
+  message,
+  Radio,
+  Row,
+  Select,
+  Slider,
+  Switch,
+  Typography,
+} from 'antd'
+import { useForm } from 'antd/lib/form/Form'
+import axios from 'axios'
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+
+const { Title } = Typography
+
+const layout = {
+  labelCol: { span: 8 },
+  wrapperCol: { span: 16 },
+}
+
+const FormCreateUser = () => {
+  const [form] = useForm()
+  const [loading, setLoading] = useState(false)
+  const [getData, setGetData] = useState([])
+  const navigate = useNavigate()
+  const params = window.location.search
+  const splitParmaUrl = params.split('?id=')
+  console.log(params)
+
+  console.log(getData)
+
+  useEffect(() => {
+    axios
+      .get(`http://localhost:4000/users?id=${splitParmaUrl[1]}`)
+      .then((res) => {
+        setGetData(res.data)
+      })
+  }, [])
+
+  const detailData = () => {
+    let payload = {
+      id: getData[0]?.id ? getData[0]?.id : '',
+      username: getData[0]?.username ? getData[0]?.username : '',
+      email: getData[0]?.email ? getData[0]?.email : '',
+      gender: getData[0]?.gender ? getData[0]?.gender : '',
+      hobbies: getData[0]?.hobbies ? getData[0]?.hobbies : '',
+      review: getData[0]?.review ? getData[0]?.review : '',
+      notificaiton: getData[0]?.notificaiton ? getData[0]?.notificaiton : '',
+    }
+    form.setFieldsValue(payload)
+  }
+
+  useEffect(() => {
+    detailData()
+  }, [getData])
+
+  const handleSubmit = (values) => {
+    if(!params) {
+      axios
+      .post(`http://localhost:4000/users`, values)
+      .then((res) => {
+        setLoading(false)
+        message.success('User Added Successfully!')
+        navigate('/table-antd')
+      })
+      .catch((err) => {
+        setLoading(false)
+        message.error(err)
+      })
+    } else {
+      axios
+      .put(`http://localhost:4000/users/${getData[0]?.id}`, values)
+      .then((res) => {
+        setLoading(false)
+        message.success('User Added Successfully!')
+        navigate('/table-antd')
+      })
+      .catch((err) => {
+        setLoading(false)
+        message.error(err)
+      })
+    }
+   
+  }
+
+  return (
+    <div className="m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl">
+      <Row gutter={[40, 0]}>
+        <Col span={23}>
+          <Title style={{ textAlign: 'center' }} level={2}>
+            Please Fill the User Form
+          </Title>
+        </Col>
+      </Row>
+      <div>
+        <Row gutter={[40, 0]}>
+          <Col span={18}>
+            <Form
+              {...layout}
+              name="form"
+              layout="vertical"
+              form={form}
+              onFinish={handleSubmit}>
+              <Form.Item
+                name="username"
+                label="UserName"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Please input your name',
+                  },
+                ]}>
+                <Input placeholder="Please Enter your username" />
+              </Form.Item>
+              <Form.Item
+                name="email"
+                label="Email"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Please input your correct email',
+                    type: 'email',
+                  },
+                ]}>
+                <Input placeholder="Please Enter your email" />
+              </Form.Item>
+              <Form.Item
+                name="gender"
+                label="Gender"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Please select your gender',
+                  },
+                ]}>
+                <Radio.Group>
+                  <Radio value="male">Male</Radio>
+                  <Radio value="female">Female</Radio>
+                  <Radio value="others">Others</Radio>
+                </Radio.Group>
+              </Form.Item>
+              <Form.Item
+                name="hobbies"
+                label="Hobbies"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Please select your hobbies',
+                    type: 'array',
+                  },
+                ]}>
+                <Select mode="multiple" placeholder="Please select you hobbies">
+                  <Select.Option value="Reading">Reading</Select.Option>
+                  <Select.Option value="Writing">Writing</Select.Option>
+                  <Select.Option value="Coding">Coding</Select.Option>
+                  <Select.Option value="Singing">Singing</Select.Option>
+                  <Select.Option value="Dancing">Dancing</Select.Option>
+                </Select>
+              </Form.Item>
+              <Form.Item name="review" label="Review">
+                <Slider />
+              </Form.Item>
+              <Form.Item
+                name="notificaiton"
+                label="Notificaiton"
+                valuePropName="checked">
+                <Switch />
+              </Form.Item>
+              <div style={{ textAlign: 'center' }}>
+                <Button type="primary" loading={loading} htmlType="submit">
+                  Save
+                </Button>
+                <Button
+                  type="danger"
+                  htmlType="button"
+                  onClick={() => navigate('/table-antd')}>
+                  Back
+                </Button>
+              </div>
+            </Form>
+          </Col>
+        </Row>
+      </div>
+    </div>
+  )
+}
+
+export default FormCreateUser

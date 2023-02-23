@@ -1,0 +1,457 @@
+---** Validate from to and select antd typescript **---
+
+
+const lowerAgeRef = useRef<HTMLInputElement>() as React.MutableRefObject<HTMLInputElement>;
+  const upperAgeRef = useRef<HTMLInputElement>() as React.MutableRefObject<HTMLInputElement>;
+
+  useEffect(() => {
+    if (form?.getFieldValue("reasons_age") === "1" || form?.getFieldValue("reasons_age") === "5") {
+      setCheckValidateMin(true);
+      form.setFields([{ name: "age_start" }]);
+      form.setFields([{ name: "age_end" }]);
+    } else {
+      setCheckValidateMin(false);
+    }
+  }, [form.getFieldValue("reasons_age")]);
+
+  useEffect(() => {
+    if (form?.getFieldValue("reasons_age") === "2") {
+      setCheckValidateMax(true);
+      form.setFields([{ name: "age_start" }]);
+      form.setFields([{ name: "age_end" }]);
+    } else {
+      setCheckValidateMax(false);
+    }
+  }, [form.getFieldValue("reasons_age")]);
+
+  useEffect(() => {
+    if (form?.getFieldValue("reasons_age") === "3") {
+      setCheckInheritance(true);
+      form.setFields([{ name: "age_start" }]);
+      form.setFields([{ name: "age_end" }]);
+    } else {
+      setCheckInheritance(false);
+    }
+  }, [form.getFieldValue("reasons_age")]);
+
+  useEffect(() => {
+    setDisable(!form.getFieldValue("language_ids")?.includes(LANGUAGE.OTHER));
+    if (form.getFieldValue("language_ids")?.includes(LANGUAGE.OTHER)) {
+      form.validateFields(["language_other"]);
+    } else {
+      form.setFields([{ name: "language_other", value: null }]);
+    }
+  }, [form.getFieldValue("language_ids")]);
+
+  const [listDetailItems, setListDetailItems] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (!information) return;
+    setListDetailItems(information.find((item: any) => item.key == "detail_item")?.data);
+  }, [information]);
+
+  const handleChange = () => {
+    const ageStart = form?.getFieldValue("age_start");
+    const ageEnd = form?.getFieldValue("age_end");
+    const ageSeasons = form?.getFieldValue("reasons_age");
+
+    form.setFields([{ name: "age_start", errors: null }]);
+    form.setFields([{ name: "age_end", errors: null }]);
+    
+    const isAgeStartNull = ageStart === undefined || ageStart === "" || ageStart === null;
+    const isAgeEndNull = ageEnd === undefined || ageEnd === "" || ageEnd === null;
+
+    if (ageSeasons === undefined || ageSeasons === "4" || ageSeasons === "6") {
+      if (!isAgeStartNull) {
+        if (ageStart < 15 || ageStart > 100) {
+          form.setFields([{ name: "age_start", errors: [t("between15and100")] }]);
+        } else if (!isAgeEndNull && (+ageStart > +ageEnd)) {
+          form.setFields([{ name: "age_start", errors: [t("startEndMessage")] }]);
+          form.setFields([{ name: "age_end", errors: [t("startEndMessage")] }]);
+        }
+      } else {
+        form.setFields([{ name: "age_start", errors: null }]);
+      }
+      if (!isAgeEndNull) {
+        if (ageEnd < 15 || ageEnd > 100) {
+          form.setFields([{ name: "age_end", errors: [t("between15and100")] }]);
+        } else if (!isAgeStartNull && (+ageEnd < +ageStart)) {
+          form.setFields([{ name: "age_start", errors: [t("startEndMessage")] }]);
+          form.setFields([{ name: "age_end", errors: [t("startEndMessage")] }]);
+        }
+      } else {
+        form.setFields([{ name: "age_end", errors: null }]);
+      }
+    }
+
+    if (ageSeasons === "1" || ageSeasons === "5") {
+      setCheckValidateMin(!ageSeasons);
+      if (isAgeStartNull) {
+        form.setFields([{ name: "age_start", errors: null }]);
+      } else {
+        form.setFields([{ name: "age_start", errors: [t("lower_limit")] }]);
+      }
+      if (!isAgeEndNull && (ageEnd < 15 || ageEnd > 100)) {
+        form.setFields([{ name: "age_end", errors: [t("between15and100")] }]);
+      } else {
+        form.setFields([{ name: "age_end", errors: null }]);
+      }
+    }
+
+    if (ageSeasons === "2") {
+      setCheckValidateMax(!ageSeasons);
+      if (isAgeEndNull) {
+        form.setFields([{ name: "age_end", errors: null }]);
+      } else {
+        form.setFields([{ name: "age_end", errors: [t("upper_limit")] }]);
+      }
+      if(!isAgeStartNull && (ageStart < 15 || ageStart > 100)) {
+        form.setFields([{ name: "age_start", errors: [t("between15and100")] }]);
+      } else {
+        form.setFields([{ name: "age_start", errors: null }]);
+      }
+    }
+
+    if (ageSeasons === "3") {
+      setCheckInheritance(!ageSeasons);
+      if ((ageStart < 30 || ageStart > 49) && (ageEnd < 30 || ageEnd > 49)) {
+        form.setFields([{ name: "age_start", errors: [t("between30and49")] }]);
+        form.setFields([{ name: "age_end", errors: [t("between30and49")] }]);
+      } else if (ageStart < 30 || ageStart > 49) {
+        form.setFields([{ name: "age_start", errors: [t("between30and49")] }]);
+        form.setFields([{ name: "age_end", errors: undefined }]);
+      } else if (ageEnd < 30 || ageEnd > 49) {
+        form.setFields([{ name: "age_start", errors: undefined }]);
+        form.setFields([{ name: "age_end", errors: [t("between30and49")] }]);
+      } else if (+ageStart > +ageEnd) {
+        form.setFields([{ name: "age_start", errors: [t("startEndMessage")] }]);
+        form.setFields([{ name: "age_end", errors: [t("startEndMessage")] }]);
+      } else if (+ageEnd - +ageStart > 10) {
+        form.setFields([{ name: "age_start", errors: [t("between30and49")] }]);
+        form.setFields([{ name: "age_end", errors: [t("between30and49")] }]);
+      } else {
+        form.setFields([{ name: "age_start", errors: null }]);
+        form.setFields([{ name: "age_end", errors: null }]);
+      }
+      if (ageStart === undefined || ageStart === "" || ageStart === null) {
+        form.setFields([{ name: "age_start", errors: [t("between30and49")] }]);
+      }
+      if (ageEnd === undefined || ageEnd === "" || ageEnd === null) {
+        form.setFields([{ name: "age_end", errors: [t("between30and49")] }]);
+      }
+    }
+  };
+
+
+<Row gutter={20}>
+        <Col className="gutter-row" span={12}>
+          <Row gutter={20}>
+            <Col className="gutter-row" span={11}>
+              <Form.Item
+                name="age_start"
+                label={
+                  <div className={styles.label}>
+                    {t("registerJob.age")}
+                    {(!checkInheritance) ? (
+                      <span className="not-required">{t("notRequired")}</span>
+                    ) : (
+                      <span className="required">{t("required")}</span>
+                    )}
+                    <span>
+                      <img src="/assets/images/hr/candidate/profile/hand-shake.svg" alt="" />
+                    </span>
+                  </div>
+                }
+                rules={[
+                  {
+                    required: checkInheritance,
+                    whitespace: true,
+                    message: t("requiredMessage"),
+                  },
+                  ({ getFieldValue, setFields }) => ({
+                    validator(_, value) {
+                      const valueEnd : any = getFieldValue("age_end");
+                      setFields([{ name: "age_start", errors: undefined }]);
+                      setFields([{ name: "age_end", errors: undefined }]);
+                      const valueExist = value !== undefined && value !== "" && value !== null;
+                      if (!checkValidateMin && !checkValidateMax && !checkInheritance) {
+                        if (!valueExist) {
+                          if (valueEnd && (+valueEnd < 15 || +valueEnd > 100)) {
+                            setFields([{ name: "age_end", errors: [t("between15and100")] }]);
+                          }
+                          return Promise.resolve();
+                        }
+                        if (+value < 15 || +value > 100) {
+                          return Promise.reject(new Error(t("between15and100")));
+                        } else {
+                          setFields([{ name: "age_start", errors: undefined }]);
+                          if (valueEnd && (+valueEnd < 15 || +valueEnd > 100)) {
+                            setFields([{ name: "age_end", errors: [t("between15and100")] }]);
+                            return Promise.resolve();
+                          } else {
+                            setFields([{ name: "age_end", errors: undefined }]);
+                          }
+                        }
+                        if (valueEnd && (+value > +valueEnd)) {
+                          return Promise.reject(new Error(t("startEndMessage")));
+                        }
+                        if (+value < +valueEnd) {
+                          setFields([{ name: "age_end", errors: undefined }]);
+                        }
+                        return Promise.resolve();
+                      } else if (checkInheritance) {
+                        if (!valueExist) {
+                          return Promise.resolve();
+                        }
+                        if (value < 30 || value > 49) {
+                          if (+value > +valueEnd) {
+                            return Promise.reject(new Error(t("startEndMessage")));
+                          }
+                          if (valueEnd >= 30 && valueEnd <= 49) {
+                            setFields([{ name: "age_end", errors: undefined }]);
+                            return Promise.reject(new Error(t("between30and49")));
+                          }
+                          setFields([{ name: "age_end", errors: [t("between30and49")] }]);
+                          return Promise.reject(new Error(t("between30and49")));
+                        } else {
+                          if (+value > +valueEnd) {
+                            return Promise.reject(new Error(t("startEndMessage")));
+                          }
+                          if (+value === +valueEnd) {
+                            setFields([{ name: "age_end", errors: undefined }]);
+                            return Promise.resolve();
+                          }
+                          if (+valueEnd > 49) {
+                            setFields([{ name: "age_end", errors: [t("between30and49")] }]);
+                            return Promise.resolve();
+                          }
+                          if (+valueEnd - +value > 10) {
+                            setFields([{ name: "age_end", errors: [t("between30and49")] }]);
+                            return Promise.reject(new Error(t("between30and49")));
+                          }
+                          setFields([{ name: "age_end", errors: undefined }]);
+                          return Promise.resolve();
+                        }
+                      } else if (checkValidateMax) {
+                        if (!valueExist) {
+                          if (valueEnd && (+valueEnd < 15 || +valueEnd > 100)) {
+                            setFields([{ name: "age_end", errors: [t("between15and100")] }]);
+                          }
+                          return Promise.resolve();
+                        }
+                        if (+value < 15 || +value > 100) {
+                          return Promise.reject(new Error(t("between15and100")));
+                        } else {
+                          setFields([{ name: "age_start", errors: undefined }]);
+                          if (valueEnd && (+valueEnd < 15 || +valueEnd > 100)) {
+                            setFields([{ name: "age_end", errors: [t("between15and100")] }]);
+                            return Promise.resolve();
+                          } else {
+                            setFields([{ name: "age_end", errors: undefined }]);
+                          }
+                        }
+                        return Promise.resolve();
+                      } else {
+                        if (!valueExist) {
+                          if (valueEnd && (+valueEnd < 15 || +valueEnd > 100)) {
+                            setFields([{ name: "age_end", errors: [t("between15and100")] }]);
+                          }
+                          return Promise.resolve();
+                        }
+                        if (valueExist) {
+                          return Promise.reject(new Error(t("lower_limit")));
+                        }
+                        if (+value < 15 || +value > 100) {
+                          return Promise.reject(new Error(t("between15and100")));
+                        } else {
+                          setFields([{ name: "age_start", errors: undefined }]);
+                          if (valueEnd && (+valueEnd < 15 || +valueEnd > 100)) {
+                            setFields([{ name: "age_end", errors: [t("between15and100")] }]);
+                            return Promise.resolve();
+                          } else {
+                            setFields([{ name: "age_end", errors: undefined }]);
+                          }
+                        }
+                        return Promise.resolve();
+                      }
+                    },
+                  }),
+                ]}
+                className={`mb-10`}>
+                <InputNumberCustom
+                  className={clsx("common-input", checkLowerError ? styles.checkError : "")}
+                  maxLength={3}
+                  placeholder={t("registerJob.lowerlimit15yearsold")}
+                  ageRef={lowerAgeRef}
+                />
+              </Form.Item>
+            </Col>
+            <Col className="gutter-row" span={2}>
+              <Form.Item
+                // name="working_system_ids"
+                label={<div className={styles.salary}>&nbsp;</div>}
+                className={`mb-5`}>
+                <div className={styles.tilde}>～</div>
+              </Form.Item>
+            </Col>
+            <Col className="gutter-row" span={11}>
+              <Form.Item
+                name="age_end"
+                label={<div className={styles.label}>&nbsp;</div>}
+                rules={[
+                  {
+                    required: checkInheritance,
+                    whitespace: true,
+                    message: t("requiredMessage"),
+                  },
+                  ({ getFieldValue, setFields }) => ({
+                    validator(_, value) {
+                      const valueStart: any = getFieldValue("age_start");
+                      setFields([{ name: "age_start", errors: undefined }]);
+                      setFields([{ name: "age_end", errors: undefined }]);
+                      const valueExist = value !== undefined && value !== "" && value !== null;
+                      if (!checkValidateMin && !checkValidateMax && !checkInheritance) {
+                        if (!valueExist) {
+                          if (valueStart && (+valueStart < 15 || +valueStart > 100)) {
+                            setFields([{ name: "age_start", errors: [t("between15and100")] }]);
+                          }
+                          return Promise.resolve();
+                        }
+                        if (+value < 15 || +value > 100) {
+                          return Promise.reject(new Error(t("between15and100")));
+                        } else {
+                          setFields([{ name: "age_end", errors: undefined }]);
+                          if (valueStart && (+valueStart < 15 || +valueStart > 100)) {
+                            setFields([{ name: "age_start", errors: [t("between15and100")] }]);
+                            return Promise.resolve();
+                          } else {
+                            setFields([{ name: "age_start", errors: undefined }]);
+                          }
+                        }
+                        if (+value < +valueStart) {
+                          return Promise.reject(new Error(t("startEndMessage")));
+                        }
+                        return Promise.resolve();
+                      } else if (checkInheritance) {
+                        if (!valueExist) {
+                          if (valueStart && (+valueStart < 15 || +valueStart > 100)) {
+                            setFields([{ name: "age_start", errors: [t("between15and100")] }]);
+                          }
+                          return Promise.resolve();
+                        }
+                        if (value < 30 || value > 49) {
+                          if (+value < +valueStart) {
+                            return Promise.reject(new Error(t("startEndMessage")));
+                          }
+                          if (valueStart >= 30 && valueStart <= 49) {
+                            setFields([{ name: "age_start", errors: undefined }]);
+                            return Promise.reject(new Error(t("between30and49")));
+                          }
+                          setFields([{ name: "age_start", errors: [t("between30and49")] }]);
+                          return Promise.reject(new Error(t("between30and49")));
+                        } else {
+                          if (+valueStart > +value) {
+                            return Promise.reject(new Error(t("startEndMessage")));
+                          }
+                          if (+value === +valueStart) {
+                            setFields([{ name: "age_start", errors: undefined }]);
+                            return Promise.resolve();
+                          }
+                          if (valueStart < 30) {
+                            setFields([{ name: "age_start", errors: [t("between30and49")] }]);
+                            return Promise.resolve();
+                          }
+                          if (+value - +valueStart > 10) {
+                            setFields([{ name: "age_start", errors: [t("between30and49")] }]);
+                            return Promise.reject(new Error(t("between30and49")));
+                          }
+                          setFields([{ name: "age_start", errors: undefined }]);
+                          return Promise.resolve();
+                        }
+                      } else if (checkValidateMax) {
+                        if (!valueExist) {
+                          if (valueStart && (+valueStart < 15 || +valueStart > 100)) {
+                            setFields([{ name: "age_start", errors: [t("between15and100")] }]);
+                          }
+                          return Promise.resolve();
+                        }
+                        if (valueExist) {
+                          return Promise.reject(new Error(t("upper_limit")));
+                        }
+                        if (+value < 15 || +value > 100) {
+                          return Promise.reject(new Error(t("between15and100")));
+                        } else {
+                          setFields([{ name: "age_end", errors: undefined }]);
+                          if (valueStart && (+valueStart < 15 || +valueStart > 100)) {
+                            setFields([{ name: "age_start", errors: [t("between15and100")] }]);
+                            return Promise.resolve();
+                          } else {
+                            setFields([{ name: "age_start", errors: undefined }]);
+                          }
+                        }
+                        return Promise.resolve();
+                      } else {
+                        if (!valueExist) {
+                          if (valueStart && (+valueStart < 15 || +valueStart > 100)) {
+                            setFields([{ name: "age_start", errors: [t("between15and100")] }]);
+                          }
+                          return Promise.resolve();
+                        }
+                        if (+value < 15 || +value > 100) {
+                          return Promise.reject(new Error(t("between15and100")));
+                        } else {
+                          setFields([{ name: "age_end", errors: undefined }]);
+                          if (valueStart && (+valueStart < 15 || +valueStart > 100)) {
+                            setFields([{ name: "age_start", errors: [t("between15and100")] }]);
+                            return Promise.resolve();
+                          } else {
+                            setFields([{ name: "age_start", errors: undefined }]);
+                          }
+                        }
+                        return Promise.resolve();
+                      }
+                    },
+                  }),
+                ]}
+                className={`mb-10`}>
+                <InputNumberCustom
+                  className={clsx("common-input", checkUpperError ? styles.checkError : "")}
+                  maxLength={3}
+                  placeholder={t("registerJob.lowerlimit100yearsold")}
+                  ageRef={upperAgeRef}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+        </Col>
+        <Col className="gutter-row" span={12}>
+          <Form.Item
+            name="reasons_age"
+            label={
+              <div className={styles.label}>
+                {t("registerJob.reasonsAgeRestrictions")}
+                <span className="not-required">{t("notRequired")}</span>
+                <span>
+                  <img src="/assets/images/hr/candidate/profile/hand-shake.svg" alt="" />
+                </span>
+              </div>
+            }
+            className={`mb-10`}>
+            <Select className="select" allowClear onChange={handleChange}>
+              {information &&
+                information.map((item: any) => {
+                  return (
+                    item.key === "reasons_age_restrictions" &&
+                    item.data.map((item1: any) => {
+                      return (
+                        <Option key={item1.id} value={item1.id}>
+                          {item1.name}
+                        </Option>
+                      );
+                    })
+                  );
+                })}
+            </Select>
+          </Form.Item>
+        </Col>
+      </Row>
