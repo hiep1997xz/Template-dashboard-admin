@@ -35,7 +35,7 @@ import { GiLouvrePyramid } from 'react-icons/gi'
 import { GrLocation } from 'react-icons/gr'
 import { HiOutlineRefresh } from 'react-icons/hi'
 import { MdOutlineSupervisorAccount } from 'react-icons/md'
-import { RiStockLine } from 'react-icons/ri'
+import { SiRedux } from 'react-icons/si'
 import { TiTick } from 'react-icons/ti'
 import avatar from '../assets/image/avatar.jpg'
 import avatar2 from '../assets/image/avatar2.jpg'
@@ -595,6 +595,15 @@ export const links = [
         name: 'cart-3d',
         icon: <AiOutlineShoppingCart />,
       },
+    ],
+  },
+  {
+    title: 'Redux',
+    links: [
+      {
+        name: 'redux-toolkit',
+        icon: <SiRedux />,
+      }
     ],
   },
 ]
