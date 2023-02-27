@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 
 const StyleInput = () => {
-  const [value, setValue] = useState('');
+  const [value, setValue] = useState('')
   function handleChange(e) {
-    setValue(e.target.value);
+    setValue(e.target.value)
   }
 
   return (
@@ -18,20 +18,16 @@ const StyleInput = () => {
         />
         <label class="user-label">First Name</label>
       </div>
-      <form>
-          <div className="input-container">
-            <input type="text" value={value} onChange={handleChange} />
-            <label className={value && 'filled'}>
-              First name
-            </label>
-          </div>
-          <div className="input-container">
-            <input type="text" value={value} onChange={handleChange} />
-            <label className={value && 'filled'}>
-              Last name
-            </label>
-          </div>
-        </form>
+      <form className='form'>
+        <div className="input-container">
+          <input type="text" value={value} onChange={handleChange} />
+          <label className={value && 'filled'}>First name</label>
+        </div>
+        <div className="input-container">
+          <input type="text" value={value} onChange={handleChange} />
+          <label className={value && 'filled'}>Last name</label>
+        </div>
+      </form>
     </>
   )
 }

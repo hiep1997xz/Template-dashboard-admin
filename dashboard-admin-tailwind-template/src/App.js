@@ -32,6 +32,7 @@ import OpenPopupImg from './page/open-img/OpenPopupImg'
 import Cart from './page/cart/Cart'
 import Form from './page/form/Form'
 import Card3d from './page/card-3d/Card3d'
+import ReduxToolkit from './page/redux/ReduxToolkit'
 
 const App = () => {
   const {
@@ -103,6 +104,7 @@ const App = () => {
                 <Route path="/cart" element={(<Cart />)} />
                 <Route path="/form" element={(<Form />)} />
                 <Route path="/cart-3d" element={(<Card3d />)} />
+                <Route path="/redux-toolkit" element={(<ReduxToolkit />)} />
               </Routes>
             </div>
             <Footer />
